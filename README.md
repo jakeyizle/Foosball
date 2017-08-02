@@ -1,0 +1,2 @@
+# Foosball
+Foosball ranking system
