@@ -7,12 +7,12 @@ namespace FoosballAttempt1
     {
         public static void DynamicsFactor(Player player)
         {
-            player.Sigma = Math.Sqrt(Math.Pow(player.Sigma, 2) + Math.Pow(Program.tau, 2));
+            player.Sigma = Math.Sqrt(Math.Pow(player.Sigma, 2) + Math.Pow(TAU, 2));
         }
 
         public static double CalculateC(double winningSigma, double losingSigma)
         {
-            return Math.Sqrt(2 * Math.Pow(beta, 2) + Math.Pow(winningSigma, 2) + Math.Pow(losingSigma, 2));
+            return Math.Sqrt(2 * Math.Pow(BETA, 2) + Math.Pow(winningSigma, 2) + Math.Pow(losingSigma, 2));
         }
 
         public static double CalculateT(double winningMu, double losingMu, double c)

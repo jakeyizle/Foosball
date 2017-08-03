@@ -70,12 +70,7 @@ namespace FoosballAttempt1
             RefreshLeaderboard(DBConnection);
         }
 
-        static void InsertIntoMatchRecord(SqlConnection DBConnection, Player[] players, string date)
-        {
-            string query = "INSERT INTO [MatchRecords] VALUES ('" + players[0].Name + "', '" + players[1].Name + "', '" + players[2].Name + "', '" + players[3].Name + "', '" + date + "')";
-            SqlCommand queryCommand = new SqlCommand(query, DBConnection);
-            queryCommand.ExecuteReader();
-        }
+
 
         public static void DisplayLeaderboard(SqlConnection DBConnection)
         {

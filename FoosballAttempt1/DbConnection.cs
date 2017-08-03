@@ -9,8 +9,10 @@ namespace FoosballAttempt1
     //This class has way too much in it
     public class DbConnection
     {
+                
         //Retrieves player stats from DB, then creates player with that info. 
         //If no player in DB, creates player with default values and adds to DB
+
         public static Player GetPlayer(string name, SqlConnection DBConnection)
         {
             string query = "SELECT TOP 1 * FROM [PlayerStats] WHERE Name='" + name + "'";
@@ -28,42 +30,30 @@ namespace FoosballAttempt1
         }
 
 
-       public static void  InitalizePlayerInDB(string name, SqlConnection DBConnection)
+        public static void  InitalizePlayerInDB(string name, SqlConnection DBConnection)
         {
-            string query = "INSERT INTO [PlayerStats] VALUES ('" + name + "', " + mu0 + ", " + sigma0 + ")";
-            SqlCommand queryCommand = new SqlCommand(query, DBConnection);
-            queryCommand.ExecuteReader();
+            string query = "INSERT INTO [PlayerStats] VALUES ('" + name + "', " + MU0 + ", " + SIGMA0 + ")";
+            ExecuteQuery(DBConnection, query);
         }
 
-       public static void UpdatePlayer(Player player, SqlConnection DBConnection)
+        public static void UpdatePlayer(Player player, SqlConnection DBConnection)
         {
             string query = "UPDATE [PlayerStats] SET Mu = " + player.Mu + ", Sigma = " + player.Sigma + "WHERE Name = '" + player.Name + "'";
-            SqlCommand queryCommand = new SqlCommand(query, DBConnection);
-            queryCommand.ExecuteReader();
+            ExecuteQuery(DBConnection, query);
         }
 
-        //Conservative score estimate: 99% of the time you will play at a level at or above this value
-        static void CalculateScore(Player player)
+        public static void InsertIntoMatchRecord(SqlConnection DBConnection, Player[] players, string date)
         {
-            player.Score = (player.Mu - 3 * player.Sigma);
+            string query = "INSERT INTO [MatchRecords] VALUES ('" + players[0].Name + "', '" + players[1].Name + "', '" + players[2].Name + "', '" + players[3].Name + "', '" + date + "')";
+            ExecuteQuery(DBConnection, query);
         }
 
-        static void CalculateRanks(Player[] players)
-        {
-            Array.Sort(players, (a, b) => a.Score.CompareTo(b.Score));
-            Array.Reverse(players);
-            for (int i = 0; i < players.Length; i++)
-            {
-                players[i].Rank = i + 1;
-            }
-        }
 
         public static void RefreshPlayerStats(SqlConnection DBConnection)
         {
             //Deletes PlayerStats table, then goes through MatchRecords table and recalculates stats
             string delete = "DELETE FROM [PlayerStats]";
-            SqlCommand deleteCommand = new SqlCommand(delete, DBConnection);
-            int a = deleteCommand.ExecuteNonQuery();
+            ExecuteQuery(DBConnection, delete);
 
             string query = "SELECT [Win1], [Win2], [Lose1], [Lose2] FROM [MatchRecords] ORDER BY Date ASC";
             SqlCommand queryCommand = new SqlCommand(query, DBConnection);
@@ -90,8 +80,7 @@ namespace FoosballAttempt1
         {
             //Delete Leaderboard, then repopulate
             string delete = "DELETE FROM [Leaderboard]";
-            SqlCommand deleteCommand = new SqlCommand(delete, DBConnection);
-            deleteCommand.ExecuteReader();
+            ExecuteQuery(DBConnection, delete);
 
             string query = "SELECT Name FROM PlayerStats";
             SqlCommand queryCommand = new SqlCommand(query, DBConnection);
@@ -115,6 +104,12 @@ namespace FoosballAttempt1
                 SqlCommand insertCommand = new SqlCommand(insert, DBConnection);
                 insertCommand.ExecuteReader();
             }
+        }
+
+        private static void ExecuteQuery(SqlConnection DBConnection, string query)
+        {
+            SqlCommand queryCommand = new SqlCommand(query, DBConnection);
+            queryCommand.ExecuteReader();
         }
     }
 }
