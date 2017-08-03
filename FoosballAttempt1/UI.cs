@@ -16,38 +16,6 @@ namespace FoosballAttempt1
 {
     public class UI
     {
-        public static void Start(SqlConnection DBConnection)
-        {
-            string answer = Text("Please choose an option:" +
-                "\r\n 1. Add a match and update skills" +
-                "\r\n 2. View Leaderboard" +
-                "\r\n 3. Delete all Player Stats and recalculate from Match Records" +
-                "\r\n 4. Exit");
-
-            switch (answer.ToLower())
-            {
-                case "1":
-                    AddMatch(DBConnection);
-                    Start(DBConnection);
-                    break;
-                case "2":
-                    DisplayLeaderboard(DBConnection);
-                    Start(DBConnection);
-                    break;
-                case "3":
-                    RefreshPlayerStats(DBConnection);
-                    Start(DBConnection);
-                    break;
-                default:
-                    Start(DBConnection);
-                    break;
-                case "4":
-                case "exit":
-                    Environment.Exit(1);
-                    break;
-
-            }
-        }
 
         public static string Text(string display)
         {
@@ -56,40 +24,42 @@ namespace FoosballAttempt1
             return Console.ReadLine();
         }
 
-        public static void AddMatch(SqlConnection DBConnection)
+        public static void AddMatch()
         {
             Player[] players = new Player[4];
-            players[0] = GetPlayer(Text("Please enter the first name of one of the winning players"), DBConnection);
-            players[1] = GetPlayer(Text("Please enter the first name of the other winning player"), DBConnection);
-            players[2] = GetPlayer(Text("Please enter the first name of one of the losing players"), DBConnection);
-            players[3] = GetPlayer(Text("Please enter the first name of the other losing player"), DBConnection);
+            players[0] = GetPlayer(Text("Please enter the first name of one of the winning players"));
+            players[1] = GetPlayer(Text("Please enter the first name of the other winning player"));
+            players[2] = GetPlayer(Text("Please enter the first name of one of the losing players"));
+            players[3] = GetPlayer(Text("Please enter the first name of the other losing player"));
             string date = Text("Please enter the date of the math as YYYY-MM-DD");
 
-            InsertIntoMatchRecord(DBConnection, players, date);
-            SkillUpdate(players[0], players[1], players[2], players[3], DBConnection);
-            RefreshLeaderboard(DBConnection);
+            InsertIntoMatchRecord(players, date);
+            SkillUpdate(players[0], players[1], players[2], players[3]);
+            RefreshLeaderboard();
         }
 
-
-
-        public static void DisplayLeaderboard(SqlConnection DBConnection)
+        public static void DisplayLeaderboard()
         {
-            RefreshLeaderboard(DBConnection);
-
-            string query = "SELECT * FROM Leaderboard";
-            SqlCommand queryCommand = new SqlCommand(query, DBConnection);
-            SqlDataReader queryCommandReader = queryCommand.ExecuteReader();
-            DataTable dataTable = new DataTable();
-            dataTable.Load(queryCommandReader);
-
-            Console.WriteLine("The current Leaderboard is:");
-            for (int j = 0; j < dataTable.Rows.Count; j++)
+            using (SqlConnection DBConnection = new SqlConnection(@CONNSTRING))
             {
-                Console.Write("Rank " + dataTable.Rows[j].Field<int>("Rank") + ". " + dataTable.Rows[j].Field<string>("Name") + " -- Score: " + dataTable.Rows[j].Field<double>("Score"));
-                Console.WriteLine("");
+                DBConnection.Open();
+                RefreshLeaderboard();
+
+                string query = "SELECT * FROM Leaderboard";
+                SqlCommand queryCommand = new SqlCommand(query, DBConnection);
+                SqlDataReader queryCommandReader = queryCommand.ExecuteReader();
+                DataTable dataTable = new DataTable();
+                dataTable.Load(queryCommandReader);
+
+                Console.WriteLine("The current Leaderboard is:");
+                for (int j = 0; j < dataTable.Rows.Count; j++)
+                {
+                    Console.Write("Rank " + dataTable.Rows[j].Field<int>("Rank") + ". " + dataTable.Rows[j].Field<string>("Name") + " -- Score: " + dataTable.Rows[j].Field<double>("Score"));
+                    Console.WriteLine("");
+                }
+                Console.WriteLine("Press any key...");
+                Console.ReadKey();
             }
-            Console.WriteLine("Press any key...");
-            Console.ReadKey();
         }
     }
 }

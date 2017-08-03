@@ -11,7 +11,7 @@ namespace FoosballAttempt1
 {
     class Algorithim
     {
-        public static void SkillUpdate(Player winPlayer1, Player winPlayer2, Player losePlayer1, Player losePlayer2, SqlConnection DBConnection)
+        public static void SkillUpdate(Player winPlayer1, Player winPlayer2, Player losePlayer1, Player losePlayer2)
         {
             //Create Team Mus and Sigmas used to calculate intermediate variables
             double winningMu = TeamMu(winPlayer1.Mu, winPlayer2.Mu);
@@ -56,7 +56,7 @@ namespace FoosballAttempt1
             //Push updates to DB
             foreach(Player player in players)
             {
-                UpdatePlayer(player, DBConnection);
+                UpdatePlayer(player);
             }
 
         }

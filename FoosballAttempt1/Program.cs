@@ -18,15 +18,40 @@ namespace FoosballAttempt1
         public const double SIGMA0 = MU0 / 3;
         public const double BETA = SIGMA0/2;
         public const double TAU = SIGMA0/100;
+        public const string CONNSTRING = "Data Source = 423ZTF2; Initial Catalog = Foosball; Integrated Security = True; MultipleActiveResultSets=True";
 
         static void Main()
         {
-            SqlConnection DBConnection = new SqlConnection(@"Data Source = 423ZTF2; Initial Catalog = Foosball; Integrated Security=True; MultipleActiveResultSets=True");
-            DBConnection.Open();
-            
-            Start(DBConnection);
+            string answer = Text("Please choose an option:" +
+    "\r\n 1. Add a match and update skills" +
+    "\r\n 2. View Leaderboard" +
+    "\r\n 3. Delete all Player Stats and recalculate from Match Records" +
+    "\r\n 4. Exit");
 
-            DBConnection.Close();
+            switch (answer.ToLower())
+            {
+                case "1":
+                    AddMatch();
+                    Main();
+                    break;
+                case "2":
+                    DisplayLeaderboard();
+                    Main();
+                    break;
+                case "3":
+                    RefreshPlayerStats();
+                    Main();
+                    break;
+                default:
+                    Main();
+                    break;
+                case "4":
+                case "exit":
+                    Environment.Exit(1);
+                    break;
+
+            }
+
         }
 
         
