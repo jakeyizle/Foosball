@@ -1,4 +1,5 @@
-﻿namespace FoosballAttempt1
+﻿using System;
+namespace FoosballAttempt1
 {
     public class Player
     {
@@ -14,6 +15,7 @@
             Sigma = sigma;
             Name = name;
         }
+
 
 
     }

@@ -25,29 +25,29 @@ namespace FoosballAttempt1
             double v = CalculateV(n, t);
             double w = CalculateW(v, t);
 
+            Player[] players = new Player[] { winPlayer1, winPlayer2, losePlayer1, losePlayer2 };
+            
             //Add dynamics factor to each players sigma
-            DynamicsFactor(winPlayer1);
-            DynamicsFactor(winPlayer2);
-            DynamicsFactor(losePlayer1);
-            DynamicsFactor(losePlayer2);
-
+            foreach(Player player in players)
+            {
+                DynamicsFactor(player);
+            }
             //Mu updates for each player
-            winPlayer1.Mu = winPlayer1.Mu + MuDelta(winPlayer1, c, v);
-            winPlayer2.Mu = winPlayer2.Mu + MuDelta(winPlayer2, c, v); ;
-            losePlayer1.Mu = losePlayer1.Mu - MuDelta(losePlayer1, c, v);
-            losePlayer2.Mu = losePlayer2.Mu - MuDelta(losePlayer2, c, v);
-
+            foreach(Player player in players)
+            {
+                player.Mu = player.Mu + MuDelta(player, c, v);
+            }
             //Sigma updates for each player
-            SigmaUpdate(winPlayer1, c, w);
-            SigmaUpdate(winPlayer2, c, w);
-            SigmaUpdate(losePlayer1, c, w);
-            SigmaUpdate(losePlayer2, c, w);
-
+            foreach(Player player in players)
+            {
+                SigmaUpdate(player, c, w);
+            }
             //Push updates to DB
-            UpdatePlayer(winPlayer1, DBConnection);
-            UpdatePlayer(winPlayer2, DBConnection);
-            UpdatePlayer(losePlayer1, DBConnection);
-            UpdatePlayer(losePlayer2, DBConnection);
+            foreach(Player player in players)
+            {
+                UpdatePlayer(player, DBConnection);
+            }
+
         }
 
         static double MuDelta(Player player, double c, double v)
