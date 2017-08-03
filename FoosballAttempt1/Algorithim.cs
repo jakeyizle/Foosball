@@ -33,9 +33,14 @@ namespace FoosballAttempt1
                 DynamicsFactor(player);
             }
             //Mu updates for each player
+            int i = 0;
             foreach(Player player in players)
             {
-                player.Mu = player.Mu + MuDelta(player, c, v);
+                //TODO: better solution for this lol
+                if (i < 2)
+                { player.Mu = player.Mu + MuDelta(player, c, v); }
+                else { player.Mu = player.Mu - MuDelta(player, c, v); }
+                i++;
             }
             //Sigma updates for each player
             foreach(Player player in players)
