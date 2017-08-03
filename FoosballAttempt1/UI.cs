@@ -22,7 +22,7 @@ namespace FoosballAttempt1
                 "\r\n 1. Add a match and update skills" +
                 "\r\n 2. View Leaderboard" +
                 "\r\n 3. Delete all Player Stats and recalculate from Match Records" +
-                "\r\n Exit");
+                "\r\n 4. Exit");
 
             switch (answer.ToLower())
             {
@@ -41,6 +41,7 @@ namespace FoosballAttempt1
                 default:
                     Start(DBConnection);
                     break;
+                case "4":
                 case "exit":
                     Environment.Exit(1);
                     break;

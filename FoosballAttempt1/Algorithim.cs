@@ -13,36 +13,42 @@ namespace FoosballAttempt1
     {
         public static void SkillUpdate(Player winPlayer1, Player winPlayer2, Player losePlayer1, Player losePlayer2, SqlConnection DBConnection)
         {
+            //Create Team Mus and Sigmas used to calculate intermediate variables
             double winningMu = TeamMu(winPlayer1.Mu, winPlayer2.Mu);
             double winningSigma = TeamSigma(winPlayer1.Sigma, winPlayer2.Sigma);
 
             double losingMu = TeamMu(losePlayer1.Mu, losePlayer2.Mu);
             double losingSigma = TeamSigma(losePlayer1.Sigma, losePlayer2.Sigma);
 
+            //c^2 = sigma^2+sigma^2+beta^2
             double c = CalculateC(winningSigma, losingSigma);
+            //t = (mu-mu)/c
             double t = CalculateT(winningMu, losingMu, c);
+            //n = NormalDistribution(t;0, 1)
             double n = CalculateN(t);
+            //v = n/cdf(t)
             double v = CalculateV(n, t);
+            //w = v*(v+t)
             double w = CalculateW(v, t);
 
             Player[] players = new Player[] { winPlayer1, winPlayer2, losePlayer1, losePlayer2 };
             
-            //Add dynamics factor to each players sigma
+            //Add tau^2 to sigma^2
             foreach(Player player in players)
             {
                 DynamicsFactor(player);
             }
-            //Mu updates for each player
+            //MU delta = sigma^2/c * v
             int i = 0;
             foreach(Player player in players)
             {
-                //TODO: better solution for this lol
+                //first 2 players won, so Mu goes up. Last 2 players lost, so Mu goes down.
                 if (i < 2)
                 { player.Mu = player.Mu + MuDelta(player, c, v); }
                 else { player.Mu = player.Mu - MuDelta(player, c, v); }
                 i++;
             }
-            //Sigma updates for each player
+            //sigma = sigma * sqrt( 1 - sigma^2/c^2 * w)
             foreach(Player player in players)
             {
                 SigmaUpdate(player, c, w);

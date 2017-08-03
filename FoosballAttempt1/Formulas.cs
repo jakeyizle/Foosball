@@ -20,9 +20,9 @@ namespace FoosballAttempt1
             return (winningMu - losingMu) / c;
         }
 
-        public static double CalculateN(double t) //This equation uses t-a, but a is always 0
+        public static double CalculateN(double t)
         {
-            return Math.Exp(-Math.Pow(t - 0, 2) / (2)) / Math.Sqrt(2 * Math.PI);
+            return Math.Exp(-Math.Pow(t, 2) / (2)) / Math.Sqrt(2 * Math.PI);
         }
 
         public static double CalculateV(double n, double t)

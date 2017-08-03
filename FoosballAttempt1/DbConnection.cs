@@ -6,6 +6,7 @@ using static FoosballAttempt1.Algorithim;
 using static FoosballAttempt1.Player;
 namespace FoosballAttempt1
 {
+    //This class has way too much in it
     public class DbConnection
     {
         //Retrieves player stats from DB, then creates player with that info. 
@@ -41,7 +42,7 @@ namespace FoosballAttempt1
             queryCommand.ExecuteReader();
         }
 
-
+        //Conservative score estimate: 99% of the time you will play at a level at or above this value
         static void CalculateScore(Player player)
         {
             player.Score = (player.Mu - 3 * player.Sigma);
@@ -59,7 +60,7 @@ namespace FoosballAttempt1
 
         public static void RefreshPlayerStats(SqlConnection DBConnection)
         {
-            //Deletes PlayerStats table, then goes through MatchRecords table and calculates stats
+            //Deletes PlayerStats table, then goes through MatchRecords table and recalculates stats
             string delete = "DELETE FROM [PlayerStats]";
             SqlCommand deleteCommand = new SqlCommand(delete, DBConnection);
             int a = deleteCommand.ExecuteNonQuery();
