@@ -34,26 +34,6 @@ namespace FoosballAttempt1
             }
         }
 
-
-        public static void  InitalizePlayerInDB(string name)
-        {
-            string query = "INSERT INTO [PlayerStats] VALUES ('" + name + "', " + MU0 + ", " + SIGMA0 + ")";
-            ExecuteQuery(query);
-        }
-
-        public static void UpdatePlayer(Player player)
-        {
-            string query = "UPDATE [PlayerStats] SET Mu = " + player.Mu + ", Sigma = " + player.Sigma + "WHERE Name = '" + player.Name + "'";
-            ExecuteQuery(query);
-        }
-
-        public static void InsertIntoMatchRecord(Player[] players, string date)
-        {
-            string query = "INSERT INTO [MatchRecords] VALUES ('" + players[0].Name + "', '" + players[1].Name + "', '" + players[2].Name + "', '" + players[3].Name + "', '" + date + "')";
-            ExecuteQuery(query);
-        }
-
-
         public static void RefreshPlayerStats()
         {
             //Deletes PlayerStats table, then goes through MatchRecords table and recalculates stats
@@ -63,7 +43,7 @@ namespace FoosballAttempt1
                 string delete = "DELETE FROM [PlayerStats]";
                 ExecuteQuery(delete);
 
-                string query = "SELECT [Win1], [Win2], [Lose1], [Lose2] FROM [MatchRecords] ORDER BY Date ASC";
+                string query =   "SELECT [Win1], [Win2], [Lose1], [Lose2] FROM [MatchRecords] ORDER BY Date ASC";
                 SqlCommand queryCommand = new SqlCommand(query, DBConnection);
                 SqlDataReader queryCommandReader = queryCommand.ExecuteReader();
                 DataTable dataTable = new DataTable();
@@ -89,8 +69,8 @@ namespace FoosballAttempt1
         {
             using (SqlConnection DBConnection = new SqlConnection(@CONNSTRING))
             {
-                DBConnection.Open();
-                //Delete Leaderboard, then repopulate
+                //Delete Leaderboard, then recalculate Scores/Ranks, then repopulate Leaderboard
+                DBConnection.Open();                
                 string delete = "DELETE FROM [Leaderboard]";
                 ExecuteQuery(delete);
 
@@ -127,7 +107,26 @@ namespace FoosballAttempt1
                 SqlCommand queryCommand = new SqlCommand(query, DBConnection);
                 queryCommand.ExecuteReader();
             }
-
         }
+
+        public static void InitalizePlayerInDB(string name)
+        {
+            string query = "INSERT INTO [PlayerStats] VALUES ('" + name + "', " + MU0 + ", " + SIGMA0 + ")";
+            ExecuteQuery(query);
+        }
+
+        public static void UpdatePlayer(Player player)
+        {
+            string query = "UPDATE [PlayerStats] SET Mu = " + player.Mu + ", Sigma = " + player.Sigma + "WHERE Name = '" + player.Name + "'";
+            ExecuteQuery(query);
+        }
+
+        public static void InsertIntoMatchRecord(Player[] players, string date)
+        {
+            string query = "INSERT INTO [MatchRecords] VALUES ('" + players[0].Name + "', '" + players[1].Name + "', '" + players[2].Name + "', '" + players[3].Name + "', '" + date + "')";
+            ExecuteQuery(query);
+        }
+
+
     }
 }

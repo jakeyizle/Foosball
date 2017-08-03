@@ -12,7 +12,7 @@ namespace FoosballAttempt1
  
         //mu0 and sigma0 are the inital values players have
         //if Player1.Mu - Player2.Mu = beta, then Player1 has an ~80% chance of beating Player2
-        //tau is the additive dynamics factor - we add it to sigma before updating. otherwise the algorithim would always decrease sigma - higher tau = more volatile leaderboard positions
+        //tau is the additive dynamics factor - we add it to sigma before updating. otherwise the algorithim would always decrease sigma. higher tau = more volatile leaderboard positions
         //not pictured is epsilon, the probability that there is a draw. for foosball, it isnt possible to draw so epsilon is 0.
         public const double MU0 = 25;
         public const double SIGMA0 = MU0 / 3;
@@ -49,23 +49,8 @@ namespace FoosballAttempt1
                 case "exit":
                     Environment.Exit(1);
                     break;
-
             }
-
         }
-
-        
-
-
-        
-
-        
-
-
-
-
-
-
     }
 }
     

@@ -31,7 +31,7 @@ namespace FoosballAttempt1
             players[1] = GetPlayer(Text("Please enter the first name of the other winning player"));
             players[2] = GetPlayer(Text("Please enter the first name of one of the losing players"));
             players[3] = GetPlayer(Text("Please enter the first name of the other losing player"));
-            string date = Text("Please enter the date of the math as YYYY-MM-DD");
+            string date = Text("Please enter the date of the match as YYYY-MM-DD");
 
             InsertIntoMatchRecord(players, date);
             SkillUpdate(players[0], players[1], players[2], players[3]);
