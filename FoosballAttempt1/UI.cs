@@ -34,8 +34,21 @@ namespace FoosballAttempt1
             string date = Text("Please enter the date of the match as YYYY-MM-DD");
 
             InsertIntoMatchRecord(players, date);
+            GetScore(players);
             SkillUpdate(players[0], players[1], players[2], players[3]);
+
+            foreach(Player player in players)
+            {
+                double oldscore = player.Score;
+                CalculateScore(player);
+                Console.WriteLine("\r\n player.Name " +
+                    "\r\n Old Score: " + Math.Round(oldscore,3) +
+                    "\r\n New Score: " + Math.Round(player.Score,3) +
+                    "\r\n Score Change: " + Math.Round(player.Score - oldscore,3));
+            }
             RefreshLeaderboard();
+            Console.WriteLine("\r\n Press any key...");
+            Console.ReadKey();
         }
 
         public static void DisplayLeaderboard()
@@ -43,7 +56,7 @@ namespace FoosballAttempt1
             using (SqlConnection DBConnection = new SqlConnection(@CONNSTRING))
             {
                 DBConnection.Open();
-                RefreshLeaderboard();
+                
 
                 string query = "SELECT * FROM Leaderboard";
                 SqlCommand queryCommand = new SqlCommand(query, DBConnection);
@@ -54,7 +67,7 @@ namespace FoosballAttempt1
                 Console.WriteLine("The current Leaderboard is:");
                 for (int j = 0; j < dataTable.Rows.Count; j++)
                 {
-                    Console.Write("Rank " + dataTable.Rows[j].Field<int>("Rank") + ". " + dataTable.Rows[j].Field<string>("Name") + " -- Score: " + dataTable.Rows[j].Field<double>("Score"));
+                    Console.Write("Rank " + dataTable.Rows[j].Field<int>("Rank") + ". " + dataTable.Rows[j].Field<string>("Name") + " -- Score: " + Math.Round(dataTable.Rows[j].Field<double>("Score"),3));
                     Console.WriteLine("");
                 }
                 Console.WriteLine("Press any key...");

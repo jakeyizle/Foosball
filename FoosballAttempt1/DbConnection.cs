@@ -40,7 +40,7 @@ namespace FoosballAttempt1
             using (SqlConnection DBConnection = new SqlConnection(@CONNSTRING))
             {
                 DBConnection.Open();
-                string delete = "DELETE FROM [PlayerStats]";
+                string delete = "TRUNCATE TABLE [PlayerStats]";
                 ExecuteQuery(delete);
 
                 string query =   "SELECT [Win1], [Win2], [Lose1], [Lose2] FROM [MatchRecords] ORDER BY Date ASC";
@@ -64,14 +64,41 @@ namespace FoosballAttempt1
                 }
             }
         }
+        
+        public static void GetScore(Player[] players)
+        {
+            using (SqlConnection DBConnection = new SqlConnection(@CONNSTRING))
+            {
+                DBConnection.Open();
+                foreach (Player player in players)
+                {
+                    string query = "SELECT Score FROM [Leaderboard] WHERE Name = '" + player.Name + "'";
+                    SqlCommand queryCommand = new SqlCommand(query, DBConnection);
+                    SqlDataReader queryCommandReader = queryCommand.ExecuteReader();
 
-       public static void RefreshLeaderboard()
+
+                    if(queryCommandReader.HasRows)
+                    {
+                        DataTable dataTable = new DataTable();
+                        dataTable.Load(queryCommandReader);
+                        player.Score = dataTable.Rows[0].Field<double>("Score");
+                    }
+                    else
+                    {
+
+                        CalculateScore(player);
+                    }
+                }
+            }
+        }
+
+        public static void RefreshLeaderboard()
         {
             using (SqlConnection DBConnection = new SqlConnection(@CONNSTRING))
             {
                 //Delete Leaderboard, then recalculate Scores/Ranks, then repopulate Leaderboard
                 DBConnection.Open();                
-                string delete = "DELETE FROM [Leaderboard]";
+                string delete = "TRUNCATE TABLE [Leaderboard]";
                 ExecuteQuery(delete);
 
                 string query = "SELECT Name FROM PlayerStats";

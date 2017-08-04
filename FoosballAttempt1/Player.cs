@@ -14,6 +14,7 @@ namespace FoosballAttempt1
             Mu = mu;
             Sigma = sigma;
             Name = name;
+            Score = mu - 3 * sigma;
         }
 
         //Conservative score estimate: 99% of the time you will play at a level at or above this value

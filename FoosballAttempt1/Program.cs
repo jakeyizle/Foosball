@@ -35,6 +35,7 @@ namespace FoosballAttempt1
                     Main();
                     break;
                 case "2":
+                    RefreshLeaderboard();
                     DisplayLeaderboard();
                     Main();
                     break;
