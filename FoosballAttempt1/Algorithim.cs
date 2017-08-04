@@ -14,6 +14,8 @@ namespace FoosballAttempt1
         public static void SkillUpdate(Player winPlayer1, Player winPlayer2, Player losePlayer1, Player losePlayer2)
         {
             //Create Team Mus and Sigmas used to calculate intermediate variables
+            //Team Mu = Mu+Mu
+            //Team Sigma = sqrt(sigma^2+sigma^2)
             double winningMu = TeamMu(winPlayer1.Mu, winPlayer2.Mu);
             double winningSigma = TeamSigma(winPlayer1.Sigma, winPlayer2.Sigma);
 

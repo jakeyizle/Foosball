@@ -39,16 +39,17 @@ namespace FoosballAttempt1
             //Deletes PlayerStats table, then goes through MatchRecords table and recalculates stats
             using (SqlConnection DBConnection = new SqlConnection(@CONNSTRING))
             {
-                DBConnection.Open();
+                
                 string delete = "TRUNCATE TABLE [PlayerStats]";
                 ExecuteQuery(delete);
 
+                DBConnection.Open();
                 string query =   "SELECT [Win1], [Win2], [Lose1], [Lose2] FROM [MatchRecords] ORDER BY Date ASC";
                 SqlCommand queryCommand = new SqlCommand(query, DBConnection);
                 SqlDataReader queryCommandReader = queryCommand.ExecuteReader();
                 DataTable dataTable = new DataTable();
                 dataTable.Load(queryCommandReader);
-
+                DBConnection.Close();
                 Player[] players = new Player[4];
 
                 for (int j = 0; j < dataTable.Rows.Count; j++)
@@ -97,10 +98,10 @@ namespace FoosballAttempt1
             using (SqlConnection DBConnection = new SqlConnection(@CONNSTRING))
             {
                 //Delete Leaderboard, then recalculate Scores/Ranks, then repopulate Leaderboard
-                DBConnection.Open();                
+                              
                 string delete = "TRUNCATE TABLE [Leaderboard]";
                 ExecuteQuery(delete);
-
+                DBConnection.Open();
                 string query = "SELECT Name FROM PlayerStats";
                 SqlCommand queryCommand = new SqlCommand(query, DBConnection);
                 SqlDataReader queryCommandReader = queryCommand.ExecuteReader();
@@ -112,7 +113,6 @@ namespace FoosballAttempt1
                 for (int i = 0; i <= dataTable.Rows.Count - 1; i++)
                 {
                     players[i] = GetPlayer(dataTable.Rows[i].Field<string>("Name"));
-                    CalculateScore(players[i]);
                 }
 
                 CalculateRanks(players);

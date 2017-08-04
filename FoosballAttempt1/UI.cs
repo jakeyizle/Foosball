@@ -27,11 +27,21 @@ namespace FoosballAttempt1
         public static void AddMatch()
         {
             Player[] players = new Player[4];
-            players[0] = GetPlayer(Text("Please enter the first name of one of the winning players"));
-            players[1] = GetPlayer(Text("Please enter the first name of the other winning player"));
-            players[2] = GetPlayer(Text("Please enter the first name of one of the losing players"));
-            players[3] = GetPlayer(Text("Please enter the first name of the other losing player"));
-            string date = Text("Please enter the date of the match as YYYY-MM-DD");
+            string date;
+
+            do
+            {
+                
+                players[0] = GetPlayer(Text("Please enter the first name of one of the winning players"));
+                players[1] = GetPlayer(Text("Please enter the first name of the other winning player"));
+                players[2] = GetPlayer(Text("Please enter the first name of one of the losing players"));
+                players[3] = GetPlayer(Text("Please enter the first name of the other losing player"));
+                date = Text("Please enter the date of the match as YYYY-MM-DD");
+            }
+            while ((!Text(" Winning team: " + players[0].Name + " and " + players[1].Name +
+                    "\r\n Losing Team: " + players[2].Name + " and " + players[3].Name +
+                    "\r\n Date: " + date +
+                    "\r\n\r\n Is this correct? Y/N").ToLower().Equals("y")));
 
             InsertIntoMatchRecord(players, date);
             GetScore(players);
@@ -41,7 +51,7 @@ namespace FoosballAttempt1
             {
                 double oldscore = player.Score;
                 CalculateScore(player);
-                Console.WriteLine("\r\n player.Name " +
+                Console.WriteLine("\r\n" + player.Name +
                     "\r\n Old Score: " + Math.Round(oldscore,3) +
                     "\r\n New Score: " + Math.Round(player.Score,3) +
                     "\r\n Score Change: " + Math.Round(player.Score - oldscore,3));
@@ -55,8 +65,7 @@ namespace FoosballAttempt1
         {
             using (SqlConnection DBConnection = new SqlConnection(@CONNSTRING))
             {
-                DBConnection.Open();
-                
+                DBConnection.Open();   
 
                 string query = "SELECT * FROM Leaderboard";
                 SqlCommand queryCommand = new SqlCommand(query, DBConnection);
