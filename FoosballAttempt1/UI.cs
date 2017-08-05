@@ -16,19 +16,17 @@ namespace FoosballAttempt1
 {
     public class UI
     {
-
         public static string Text(string display)
         {
             Console.Clear();
             Console.WriteLine(display);
             return Console.ReadLine();
         }
-
+        //gets names and date from user, inserts match into matchrecord, updates player/team stats, displays difference in scores, refreshes leaderboard
         public static void AddMatch()
         {
             Player[] players = new Player[4];
             string date;
-
             do
             {               
                 players[0] = GetPlayer(Text("Please enter the first name of one of the winning players"));
@@ -41,16 +39,10 @@ namespace FoosballAttempt1
                     "\r\n Losing Team: " + players[2].Name + " and " + players[3].Name +
                     "\r\n Date: " + date +
                     "\r\n\r\n Is this correct? Y/N").ToLower().Equals("y")));
-
             Console.Clear();
-            InsertIntoMatchRecord(players, date);
-            //hacky solution - 
-           // GetScore(players);
-
-            SkillUpdate(players);
-            
+            ExecuteQuery("INSERT INTO [MatchRecords] VALUES ('" + players[0].Name + "', '" + players[1].Name + "', '" + players[2].Name + "', '" + players[3].Name + "', '" + date + "')");
+            SkillUpdate(players);            
             Player[] teams = TeamSkillUpdate(players);
-
             foreach (Player player in players)
             {
                 double oldscore = player.Score;
@@ -77,47 +69,29 @@ namespace FoosballAttempt1
         }
         public static void DisplayTeamLeaderboard()
         {
-            using (SqlConnection DBConnection = new SqlConnection(@CONNSTRING))
+            RefreshTeamLeaderboard();
+            DataTable dataTable = ExecuteQuery("SELECT * FROM TeamLeaderboard");
+            Console.WriteLine("The current Team Leaderboard is:");
+            for (int j = 0; j < dataTable.Rows.Count; j++)
             {
-                DBConnection.Open();
-
-                string query = "SELECT * FROM TeamLeaderboard";
-                SqlCommand queryCommand = new SqlCommand(query, DBConnection);
-                SqlDataReader queryCommandReader = queryCommand.ExecuteReader();
-                DataTable dataTable = new DataTable();
-                dataTable.Load(queryCommandReader);
-
-                Console.WriteLine("The current Team Leaderboard is:");
-                for (int j = 0; j < dataTable.Rows.Count; j++)
-                {
-                    Console.Write("Rank " + dataTable.Rows[j].Field<int>("Rank") + ". " + dataTable.Rows[j].Field<string>("Name") + " -- Score: " + Math.Round(dataTable.Rows[j].Field<double>("Score"), 3));
-                    Console.WriteLine("");
-                }
-                Console.WriteLine("Press any key...");
-                Console.ReadKey();
+                Console.Write("Rank " + dataTable.Rows[j].Field<int>("Rank") + ". " + dataTable.Rows[j].Field<string>("Name") + " -- Score: " + Math.Round(dataTable.Rows[j].Field<double>("Score"), 3));
+                Console.WriteLine("");
             }
+            Console.WriteLine("Press any key...");
+            Console.ReadKey();           
         }
         public static void DisplayLeaderboard()
         {
-            using (SqlConnection DBConnection = new SqlConnection(@CONNSTRING))
+            RefreshLeaderboard();
+            DataTable dataTable = ExecuteQuery("SELECT * FROM Leaderboard");
+            Console.WriteLine("The current Leaderboard is:");
+            for (int j = 0; j < dataTable.Rows.Count; j++)
             {
-                DBConnection.Open();   
-
-                string query = "SELECT * FROM Leaderboard";
-                SqlCommand queryCommand = new SqlCommand(query, DBConnection);
-                SqlDataReader queryCommandReader = queryCommand.ExecuteReader();
-                DataTable dataTable = new DataTable();
-                dataTable.Load(queryCommandReader);
-
-                Console.WriteLine("The current Leaderboard is:");
-                for (int j = 0; j < dataTable.Rows.Count; j++)
-                {
-                    Console.Write("Rank " + dataTable.Rows[j].Field<int>("Rank") + ". " + dataTable.Rows[j].Field<string>("Name") + " -- Score: " + Math.Round(dataTable.Rows[j].Field<double>("Score"),3));
-                    Console.WriteLine("");
-                }
-                Console.WriteLine("Press any key...");
-                Console.ReadKey();
+                Console.Write("Rank " + dataTable.Rows[j].Field<int>("Rank") + ". " + dataTable.Rows[j].Field<string>("Name") + " -- Score: " + Math.Round(dataTable.Rows[j].Field<double>("Score"),3));
+                Console.WriteLine("");
             }
+            Console.WriteLine("Press any key...");
+            Console.ReadKey();           
         }
     }
 }

@@ -36,17 +36,15 @@ namespace FoosballAttempt1
                     Main();
                     break;
                 case "2":
-                    RefreshLeaderboard();
                     DisplayLeaderboard();
                     Main();
                     break;
                 case "3":
-                    RefreshTeamLeaderboard();
                     DisplayTeamLeaderboard();
                     Main();
                     break;
                 case "4":
-                    RefreshPlayerStats();
+                    RefreshStats();
                     Main();
                     break;
                 default:

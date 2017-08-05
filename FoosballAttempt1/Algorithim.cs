@@ -18,8 +18,6 @@ namespace FoosballAttempt1
             //returns 2 player array
             Player[] teams = MakeTeam(players);
 
-            
-
             double c = CalculateC(teams[0].Sigma, teams[1].Sigma);
             double t = CalculateT(teams[0].Mu, teams[1].Mu, c);
             double n = CalculateN(t);
@@ -49,7 +47,7 @@ namespace FoosballAttempt1
             //Push updates to DB
             foreach (Player player in teams)
             {
-                UpdateTeam(player);
+                ExecuteQuery("UPDATE [TeamStats] SET Mu = " + player.Mu + ", Sigma = " + player.Sigma + "WHERE Name = '" + player.Name + "'");
             }
             return teams;
         }
@@ -77,9 +75,7 @@ namespace FoosballAttempt1
             double v = CalculateV(n, t);
             //w = v*(v+t)
             double w = CalculateW(v, t);
-
-
-            
+         
             //Add tau^2 to sigma^2
             foreach(Player player in players)
             {
@@ -103,7 +99,7 @@ namespace FoosballAttempt1
             //Push updates to DB
             foreach(Player player in players)
             {
-                UpdatePlayer(player);
+                ExecuteQuery("UPDATE [PlayerStats] SET Mu = " + player.Mu + ", Sigma = " + player.Sigma + "WHERE Name = '" + player.Name + "'");
             }
 
         }
