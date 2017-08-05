@@ -30,8 +30,7 @@ namespace FoosballAttempt1
             string date;
 
             do
-            {
-                
+            {               
                 players[0] = GetPlayer(Text("Please enter the first name of one of the winning players"));
                 players[1] = GetPlayer(Text("Please enter the first name of the other winning player"));
                 players[2] = GetPlayer(Text("Please enter the first name of one of the losing players"));
@@ -43,24 +42,61 @@ namespace FoosballAttempt1
                     "\r\n Date: " + date +
                     "\r\n\r\n Is this correct? Y/N").ToLower().Equals("y")));
 
+            Console.Clear();
             InsertIntoMatchRecord(players, date);
-            GetScore(players);
-            SkillUpdate(players[0], players[1], players[2], players[3]);
+            //hacky solution - 
+           // GetScore(players);
 
-            foreach(Player player in players)
+            SkillUpdate(players);
+            
+            Player[] teams = TeamSkillUpdate(players);
+
+            foreach (Player player in players)
             {
                 double oldscore = player.Score;
                 CalculateScore(player);
-                Console.WriteLine("\r\n" + player.Name +
+                Console.WriteLine(player.Name +
                     "\r\n Old Score: " + Math.Round(oldscore,3) +
                     "\r\n New Score: " + Math.Round(player.Score,3) +
                     "\r\n Score Change: " + Math.Round(player.Score - oldscore,3));
             }
+            Console.Write("\r\n");
+            foreach(Player team in teams)
+            {
+                double oldscore = team.Score;
+                CalculateScore(team);
+                Console.WriteLine("Team " + team.Name +
+                    "\r\n Old Score: " + Math.Round(oldscore, 3) +
+                    "\r\n New Score: " + Math.Round(team.Score, 3) +
+                    "\r\n Score Change: " + Math.Round(team.Score - oldscore, 3));
+            }
             RefreshLeaderboard();
+            RefreshTeamLeaderboard();
             Console.WriteLine("\r\n Press any key...");
             Console.ReadKey();
         }
+        public static void DisplayTeamLeaderboard()
+        {
+            using (SqlConnection DBConnection = new SqlConnection(@CONNSTRING))
+            {
+                DBConnection.Open();
 
+                string query = "SELECT * FROM TeamLeaderboard";
+                SqlCommand queryCommand = new SqlCommand(query, DBConnection);
+                SqlDataReader queryCommandReader = queryCommand.ExecuteReader();
+                DataTable dataTable = new DataTable();
+                dataTable.Load(queryCommandReader);
+
+                Console.WriteLine("The current Team Leaderboard is:");
+                for (int j = 0; j < dataTable.Rows.Count; j++)
+                {
+                    Console.Write("Rank " + dataTable.Rows[j].Field<int>("Rank") + ". " + dataTable.Rows[j].Field<string>("Name") + " -- Score: " + Math.Round(dataTable.Rows[j].Field<double>("Score"), 3));
+                    Console.WriteLine("");
+                }
+                Console.WriteLine("Press any key...");
+                Console.ReadKey();
+            }
+        }
         public static void DisplayLeaderboard()
         {
             using (SqlConnection DBConnection = new SqlConnection(@CONNSTRING))

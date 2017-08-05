@@ -25,8 +25,9 @@ namespace FoosballAttempt1
             string answer = Text("Please choose an option:" +
     "\r\n 1. Add a match and update skills" +
     "\r\n 2. View Leaderboard" +
-    "\r\n 3. Delete all Player Stats and recalculate from Match Records" +
-    "\r\n 4. Exit");
+    "\r\n 3. View Team Leaderboard" +
+    "\r\n 4. Delete all Player/Team Stats and recalculate from Match Records" +
+    "\r\n 5. Exit");
 
             switch (answer.ToLower())
             {
@@ -40,13 +41,18 @@ namespace FoosballAttempt1
                     Main();
                     break;
                 case "3":
+                    RefreshTeamLeaderboard();
+                    DisplayTeamLeaderboard();
+                    Main();
+                    break;
+                case "4":
                     RefreshPlayerStats();
                     Main();
                     break;
                 default:
                     Main();
                     break;
-                case "4":
+                case "5":
                 case "exit":
                     Environment.Exit(1);
                     break;

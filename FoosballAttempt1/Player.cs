@@ -1,4 +1,5 @@
 ﻿using System;
+using static FoosballAttempt1.DbConnection;
 namespace FoosballAttempt1
 {
     public class Player
@@ -33,7 +34,22 @@ namespace FoosballAttempt1
                 players[i].Rank = i + 1;
             }
         }
+        //sorts each team (0, 1 and 2, 3) in alphabetical order
+        //returns 2 player array, winning team and losing team
+        public static Player[] MakeTeam(Player[] players)
+        {
+            for (int j = 0; j <= 2; j = j + 2)
+            {
+                if (string.Compare(players[j].Name, players[j + 1].Name, true) > 0)
+                {
+                    Player buffer = players[j];
+                    players[j] = players[j + 1];
+                    players[j + 1] = buffer;
+                }
 
+            }
+            return new Player[] { GetTeam(players[0].Name + " and " + players[1].Name), GetTeam(players[2].Name + " and " + players[3].Name) };
+        }
 
     }
 }

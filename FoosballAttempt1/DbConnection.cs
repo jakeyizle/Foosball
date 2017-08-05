@@ -33,7 +33,28 @@ namespace FoosballAttempt1
                 return new Player(dataTable.Rows[0].Field<double>("Mu"), dataTable.Rows[0].Field<double>("Sigma"), name);
             }
         }
-
+        //look for Team in DB, then return
+        public static Player GetTeam(string name)
+        {
+            using (SqlConnection DBConnection = new SqlConnection(CONNSTRING))
+            {
+                DBConnection.Open();
+                string query = "SELECT TOP 1 * FROM [TeamStats] WHERE Name ='" + name + "'";
+                SqlCommand queryCommand = new SqlCommand(query, DBConnection);
+                SqlDataReader queryCommandReader = queryCommand.ExecuteReader();
+                DataTable dataTable = new DataTable();
+                dataTable.Load(queryCommandReader);
+                
+                //if nothing retrieved from DB, add it in DB then look it up and return it
+                if (dataTable.Rows.Count == 0)
+                {
+                    InitalizeTeamInDB(name);
+                    return GetTeam(name);
+                }
+                return new Player(dataTable.Rows[0].Field<double>("Mu"), dataTable.Rows[0].Field<double>("Sigma"), name);
+            }
+        }
+       
         public static void RefreshPlayerStats()
         {
             //Deletes PlayerStats table, then goes through MatchRecords table and recalculates stats
@@ -41,6 +62,9 @@ namespace FoosballAttempt1
             {
                 
                 string delete = "TRUNCATE TABLE [PlayerStats]";
+                ExecuteQuery(delete);
+
+                delete = "TRUNCATE TABLE [teamStats]";
                 ExecuteQuery(delete);
 
                 DBConnection.Open();
@@ -57,11 +81,14 @@ namespace FoosballAttempt1
                     int i = 0;
                     foreach (DataColumn column in dataTable.Columns)
                     {
-                        string name = dataTable.Rows[j][column.ColumnName].ToString();
+                        string name = dataTable.Rows[j][column.ColumnName].ToString().ToLower();
                         players[i] = GetPlayer(name);
                         i++;
                     }
-                    SkillUpdate(players[0], players[1], players[2], players[3]);
+                    SkillUpdate(players);
+
+
+                    TeamSkillUpdate(players);
                 }
             }
         }
@@ -92,7 +119,35 @@ namespace FoosballAttempt1
                 }
             }
         }
+        public static void RefreshTeamLeaderboard()
+        {
+            using (SqlConnection DBConnection = new SqlConnection(@CONNSTRING))
+            {
+                string delete = "TRUNCATE TABLE [TeamLeaderboard]";
 
+                ExecuteQuery(delete);
+                DBConnection.Open();
+                string query = "SELECT Name FROM TeamStats";
+                SqlCommand queryCommand = new SqlCommand(query, DBConnection);
+                SqlDataReader queryCommandReader = queryCommand.ExecuteReader();
+                DataTable dataTable = new DataTable();
+                dataTable.Load(queryCommandReader);
+
+                Player[] teams = new Player[dataTable.Rows.Count];
+                for (int i = 0; i <= dataTable.Rows.Count - 1; i++)
+                {
+                    teams[i] = GetTeam(dataTable.Rows[i].Field<string>("Name"));
+                }
+
+                CalculateRanks(teams);
+                foreach (Player team in teams)
+                {
+                    string insert = "INSERT INTO TeamLeaderboard VALUES ('" + team.Name + "', " + team.Rank + ", " + team.Score + ")";
+                    ExecuteQuery(insert);
+
+                }
+            }
+        }
         public static void RefreshLeaderboard()
         {
             using (SqlConnection DBConnection = new SqlConnection(@CONNSTRING))
@@ -120,8 +175,7 @@ namespace FoosballAttempt1
                 foreach (Player player in players)
                 {
                     string insert = "INSERT INTO Leaderboard VALUES ('" + player.Name + "', " + player.Rank + ", " + player.Score + ")";
-                    SqlCommand insertCommand = new SqlCommand(insert, DBConnection);
-                    insertCommand.ExecuteReader();
+                    ExecuteQuery(insert);
                 }
             }
         }
@@ -142,9 +196,21 @@ namespace FoosballAttempt1
             ExecuteQuery(query);
         }
 
+        public static void InitalizeTeamInDB(string name)
+        {
+            string query = "INSERT INTO [TeamStats] VALUES ('" + name + "', " + MU0 + ", " + SIGMA0 + ")";
+            ExecuteQuery(query);
+        }
+
         public static void UpdatePlayer(Player player)
         {
             string query = "UPDATE [PlayerStats] SET Mu = " + player.Mu + ", Sigma = " + player.Sigma + "WHERE Name = '" + player.Name + "'";
+            ExecuteQuery(query);
+        }
+
+        public static void UpdateTeam(Player player)
+        {
+            string query = "UPDATE [TeamStats] SET Mu = " + player.Mu + ", Sigma = " + player.Sigma + "WHERE Name = '" + player.Name + "'";
             ExecuteQuery(query);
         }
 
@@ -153,6 +219,8 @@ namespace FoosballAttempt1
             string query = "INSERT INTO [MatchRecords] VALUES ('" + players[0].Name + "', '" + players[1].Name + "', '" + players[2].Name + "', '" + players[3].Name + "', '" + date + "')";
             ExecuteQuery(query);
         }
+
+
 
 
     }

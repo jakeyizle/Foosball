@@ -5,22 +5,67 @@ using System.Text;
 using System.Threading.Tasks;
 using static FoosballAttempt1.Formulas;
 using static FoosballAttempt1.DbConnection;
+using static FoosballAttempt1.Player;
 using System.Data.SqlClient;
 
 namespace FoosballAttempt1
 {
     class Algorithim
     {
-        public static void SkillUpdate(Player winPlayer1, Player winPlayer2, Player losePlayer1, Player losePlayer2)
+        public static Player[] TeamSkillUpdate(Player[] players)
+        {
+            //Sort each team into alphabetical order
+            //returns 2 player array
+            Player[] teams = MakeTeam(players);
+
+            
+
+            double c = CalculateC(teams[0].Sigma, teams[1].Sigma);
+            double t = CalculateT(teams[0].Mu, teams[1].Mu, c);
+            double n = CalculateN(t);
+            double v = CalculateV(n, t);
+            double w = CalculateW(v, t);
+
+            foreach (Player player in teams)
+            {
+                DynamicsFactor(player);
+            }
+            //Purposefully don't update Score here, so that we can report on previous and updated scores
+            //MU delta = sigma^2/c * v
+            int i = 0;
+
+            foreach (Player player in teams)
+            {
+                if (i < 1)
+                { player.Mu = player.Mu + MuDelta(player, c, v); }
+                else { player.Mu = player.Mu - MuDelta(player, c, v); }
+                i++;
+            }
+            //sigma = sigma * sqrt( 1 - sigma^2/c^2 * w)
+            foreach (Player player in teams)
+            {
+                SigmaUpdate(player, c, w);
+            }
+            //Push updates to DB
+            foreach (Player player in teams)
+            {
+                UpdateTeam(player);
+            }
+            return teams;
+        }
+
+
+
+        public static void SkillUpdate(Player[] players)
         {
             //Create Team Mus and Sigmas used to calculate intermediate variables
             //Team Mu = Mu+Mu
             //Team Sigma = sqrt(sigma^2+sigma^2)
-            double winningMu = TeamMu(winPlayer1.Mu, winPlayer2.Mu);
-            double winningSigma = TeamSigma(winPlayer1.Sigma, winPlayer2.Sigma);
+            double winningMu = TeamMu(players[0].Mu, players[1].Mu);
+            double winningSigma = TeamSigma(players[0].Sigma, players[1].Sigma);
 
-            double losingMu = TeamMu(losePlayer1.Mu, losePlayer2.Mu);
-            double losingSigma = TeamSigma(losePlayer1.Sigma, losePlayer2.Sigma);
+            double losingMu = TeamMu(players[2].Mu, players[3].Mu);
+            double losingSigma = TeamSigma(players[2].Sigma, players[3].Sigma);
 
             //c^2 = sigma^2+sigma^2+beta^2
             double c = CalculateC(winningSigma, losingSigma);
@@ -33,7 +78,7 @@ namespace FoosballAttempt1
             //w = v*(v+t)
             double w = CalculateW(v, t);
 
-            Player[] players = new Player[] { winPlayer1, winPlayer2, losePlayer1, losePlayer2 };
+
             
             //Add tau^2 to sigma^2
             foreach(Player player in players)
