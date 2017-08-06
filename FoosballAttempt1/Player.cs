@@ -19,7 +19,8 @@ namespace FoosballAttempt1
             Name = name;
             Score = mu - 3 * sigma;
             //this is solution to make sure that "teams" get a gamecount
-            //sorry
+            //only team names should contain " and ", then code is to generate first players name and second players name
+            //then count MatchRecords where both players are on same team
             if (name.Contains(" and "))
             {
                 string name1 = "";
@@ -45,7 +46,7 @@ namespace FoosballAttempt1
             }
             else
             {
-                DataTable dataTable = ExecuteQuery("SELECT COUNT(*) FROM MatchRecords WHERE Win1 = '" + name + "' or Win2 = '" + name + "' or lose1 = '" + name + "' or lose2 = '" + name + "'");
+                DataTable dataTable = ExecuteQuery("SELECT COUNT(*) FROM MatchRecords WHERE '" +  name + "' in (win1, win2, lose1, lose2)");
                 GameCount = dataTable.Rows[0].Field<int>(0);
             }
 

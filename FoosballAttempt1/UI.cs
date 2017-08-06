@@ -93,26 +93,26 @@ namespace FoosballAttempt1
         {
             RefreshTeamLeaderboard();
             DataTable dataTable = ExecuteQuery("SELECT * FROM TeamLeaderboard");
-            Console.WriteLine("The current Team Leaderboard is:");
+            Console.WriteLine("\r\nThe current Team Leaderboard is:");
             for (int j = 0; j < dataTable.Rows.Count; j++)
             {
                 Console.Write("Rank " + dataTable.Rows[j].Field<int>("Rank") + ". " + dataTable.Rows[j].Field<string>("Name") + " -- Score: " + Math.Round(dataTable.Rows[j].Field<double>("Score"), 3) + " -- Game Count: " + dataTable.Rows[j].Field<int>("Game Count"));
                 Console.WriteLine("");
             }
-            Console.WriteLine("Press any key...");
+            Console.WriteLine("\r\nPress any key...");
             Console.ReadKey();           
         }
         public static void DisplayLeaderboard()
         {
             RefreshLeaderboard();
             DataTable dataTable = ExecuteQuery("SELECT * FROM Leaderboard");
-            Console.WriteLine("The current Leaderboard is:");
+            Console.WriteLine("\r\nThe current Leaderboard is:");
             for (int j = 0; j < dataTable.Rows.Count; j++)
             {
                 Console.Write("Rank " + dataTable.Rows[j].Field<int>("Rank") + ". " + dataTable.Rows[j].Field<string>("Name") + " -- Score: " + Math.Round(dataTable.Rows[j].Field<double>("Score"),3) + " -- Game Count: " + dataTable.Rows[j].Field<int>("Game Count"));
                 Console.WriteLine("");
             }
-            Console.WriteLine("Press any key...");
+            Console.WriteLine("\r\nPress any key...");
             Console.ReadKey();           
         }
         public static void RefreshStats()
