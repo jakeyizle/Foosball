@@ -9,7 +9,6 @@ namespace FoosballAttempt1
     //This class has way too much in it
     public class DbConnection
     {
-
         //Retrieves player stats from DB, then creates player with that info. 
         //If no player in DB, creates player with default values and adds to DB            
         public static Player GetPlayer(string name)
@@ -34,27 +33,7 @@ namespace FoosballAttempt1
             return new Player(dataTable.Rows[0].Field<double>("Mu"), dataTable.Rows[0].Field<double>("Sigma"), name);            
         }
         //Deletes PlayerStats/teamstats table, then goes through MatchRecords table and recalculates stats
-        public static void RefreshStats()
-        {
-            ExecuteQuery("TRUNCATE TABLE [PlayerStats]");
-            ExecuteQuery("TRUNCATE TABLE [teamStats]");
-
-            DataTable dataTable = ExecuteQuery("SELECT [Win1], [Win2], [Lose1], [Lose2] FROM [MatchRecords] ORDER BY Date ASC");               
-            Player[] players = new Player[4];
-
-            for (int j = 0; j < dataTable.Rows.Count; j++)
-            {
-                int i = 0;
-                foreach (DataColumn column in dataTable.Columns)
-                {
-                    string name = dataTable.Rows[j][column.ColumnName].ToString().ToLower();
-                    players[i] = GetPlayer(name);
-                    i++;
-                }
-                SkillUpdate(players);
-                TeamSkillUpdate(players);                
-            }
-        }
+        
         //Delete Leaderboard, pull all teams from teamstats, calculate scores/ranks, insert into leaderboard
         public static void RefreshTeamLeaderboard()
         {
@@ -70,7 +49,7 @@ namespace FoosballAttempt1
             CalculateRanks(teams);
             foreach (Player team in teams)
             {
-                ExecuteQuery("INSERT INTO TeamLeaderboard VALUES ('" + team.Name + "', " + team.Rank + ", " + team.Score + ")");
+                ExecuteQuery("INSERT INTO TeamLeaderboard VALUES ('" + team.Name + "', " + team.Rank + ", " + team.Score + ", " + team.GameCount + ")");
             }
         }
         //Delete Leaderboard, pull all players from playerstats, calculate scores/ranks, insert into leaderboard
@@ -88,7 +67,7 @@ namespace FoosballAttempt1
 
             foreach (Player player in players)
             {
-                ExecuteQuery("INSERT INTO Leaderboard VALUES ('" + player.Name + "', " + player.Rank + ", " + player.Score + ")");
+                ExecuteQuery("INSERT INTO Leaderboard VALUES ('" + player.Name + "', " + player.Rank + ", " + player.Score + ", " + player.GameCount + ")");
             }
             
         }

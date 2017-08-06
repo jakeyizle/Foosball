@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using static FoosballAttempt1.DbConnection;
 namespace FoosballAttempt1
 {
@@ -9,6 +10,7 @@ namespace FoosballAttempt1
         public string Name { get; set; } 
         public double Score { get; set; }
         public int Rank { get; set; }
+        public int GameCount { get; set; }
 
         public Player(double mu, double sigma, string name)
         {
@@ -16,6 +18,37 @@ namespace FoosballAttempt1
             Sigma = sigma;
             Name = name;
             Score = mu - 3 * sigma;
+            //this is solution to make sure that "teams" get a gamecount
+            //sorry
+            if (name.Contains(" and "))
+            {
+                string name1 = "";
+                string name2 = "";
+                foreach (char c in name)
+                {
+                    if (char.IsWhiteSpace(c))
+                    {
+                        break;
+                    }
+                    name1 = name1 + c;
+                }
+                int counter = 0;
+                foreach (char c in name)
+                {
+                    if (counter==2)
+                    { name2 = name2 + c; }
+                    if (char.IsWhiteSpace(c))
+                    { counter++; }
+                }
+                DataTable dataTable = ExecuteQuery("SELECT(COUNT(*)) FROM MatchRecords WHERE('" + name1 + "' in (win1, win2) and '" + name2 + "' in (win1, win2)) OR('" + name1 + "' in (lose1, lose2) and '" + name2 + "' in (lose1, lose2))");
+                GameCount = dataTable.Rows[0].Field<int>(0);
+            }
+            else
+            {
+                DataTable dataTable = ExecuteQuery("SELECT COUNT(*) FROM MatchRecords WHERE Win1 = '" + name + "' or Win2 = '" + name + "' or lose1 = '" + name + "' or lose2 = '" + name + "'");
+                GameCount = dataTable.Rows[0].Field<int>(0);
+            }
+
         }
 
         //Conservative score estimate: 99% of the time you will play at a level at or above this value

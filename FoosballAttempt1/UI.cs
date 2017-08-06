@@ -43,20 +43,42 @@ namespace FoosballAttempt1
             ExecuteQuery("INSERT INTO [MatchRecords] VALUES ('" + players[0].Name + "', '" + players[1].Name + "', '" + players[2].Name + "', '" + players[3].Name + "', '" + date + "')");
             SkillUpdate(players);            
             Player[] teams = TeamSkillUpdate(players);
+
+            //Console.WriteLine("{0,10}{1,20}{2,25}{3,30}",
+            //    "Player Name",
+            //    "Old Score",
+            //    "New Score",
+            //    "Score Change");
             foreach (Player player in players)
             {
                 double oldscore = player.Score;
                 CalculateScore(player);
+                //Console.WriteLine("{0,10}{1,20}{2,25}{3,30}",
+                //    player.Name,
+                //    Math.Round(oldscore, 3),
+                //    Math.Round(player.Score, 3),
+                //    Math.Round(player.Score - oldscore, 3)
+                //    );
                 Console.WriteLine(player.Name +
-                    "\r\n Old Score: " + Math.Round(oldscore,3) +
-                    "\r\n New Score: " + Math.Round(player.Score,3) +
-                    "\r\n Score Change: " + Math.Round(player.Score - oldscore,3));
+                    "\r\n Old Score: " + Math.Round(oldscore, 3) +
+                    "\r\n New Score: " + Math.Round(player.Score, 3) +
+                    "\r\n Score Change: " + Math.Round(player.Score - oldscore, 3));
             }
             Console.Write("\r\n");
+            //Console.WriteLine("{0,0}{1,15}{2,30}{3,45}",
+            //    "Team Name",
+            //    "Old Score",
+            //    "New Score",
+            //    "Score Change");
             foreach(Player team in teams)
             {
                 double oldscore = team.Score;
                 CalculateScore(team);
+                //Console.WriteLine("{0,0}{1,15}{2,30}{3,45}",
+                //    team.Name,
+                //    Math.Round(oldscore, 3),
+                //    Math.Round(team.Score, 3),
+                //    Math.Round(team.Score - oldscore, 3));
                 Console.WriteLine("Team " + team.Name +
                     "\r\n Old Score: " + Math.Round(oldscore, 3) +
                     "\r\n New Score: " + Math.Round(team.Score, 3) +
@@ -74,7 +96,7 @@ namespace FoosballAttempt1
             Console.WriteLine("The current Team Leaderboard is:");
             for (int j = 0; j < dataTable.Rows.Count; j++)
             {
-                Console.Write("Rank " + dataTable.Rows[j].Field<int>("Rank") + ". " + dataTable.Rows[j].Field<string>("Name") + " -- Score: " + Math.Round(dataTable.Rows[j].Field<double>("Score"), 3));
+                Console.Write("Rank " + dataTable.Rows[j].Field<int>("Rank") + ". " + dataTable.Rows[j].Field<string>("Name") + " -- Score: " + Math.Round(dataTable.Rows[j].Field<double>("Score"), 3) + " -- Game Count: " + dataTable.Rows[j].Field<int>("Game Count"));
                 Console.WriteLine("");
             }
             Console.WriteLine("Press any key...");
@@ -87,11 +109,33 @@ namespace FoosballAttempt1
             Console.WriteLine("The current Leaderboard is:");
             for (int j = 0; j < dataTable.Rows.Count; j++)
             {
-                Console.Write("Rank " + dataTable.Rows[j].Field<int>("Rank") + ". " + dataTable.Rows[j].Field<string>("Name") + " -- Score: " + Math.Round(dataTable.Rows[j].Field<double>("Score"),3));
+                Console.Write("Rank " + dataTable.Rows[j].Field<int>("Rank") + ". " + dataTable.Rows[j].Field<string>("Name") + " -- Score: " + Math.Round(dataTable.Rows[j].Field<double>("Score"),3) + " -- Game Count: " + dataTable.Rows[j].Field<int>("Game Count"));
                 Console.WriteLine("");
             }
             Console.WriteLine("Press any key...");
             Console.ReadKey();           
         }
+        public static void RefreshStats()
+        {
+            ExecuteQuery("TRUNCATE TABLE [PlayerStats]");
+            ExecuteQuery("TRUNCATE TABLE [teamStats]");
+
+            DataTable dataTable = ExecuteQuery("SELECT [Win1], [Win2], [Lose1], [Lose2] FROM [MatchRecords] ORDER BY Date ASC");
+            Player[] players = new Player[4];
+
+            for (int j = 0; j < dataTable.Rows.Count; j++)
+            {
+                int i = 0;
+                foreach (DataColumn column in dataTable.Columns)
+                {
+                    string name = dataTable.Rows[j][column.ColumnName].ToString().ToLower();
+                    players[i] = GetPlayer(name);
+                    i++;
+                }
+                SkillUpdate(players);
+                TeamSkillUpdate(players);
+            }
+        }
+
     }
 }
