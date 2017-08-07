@@ -17,7 +17,6 @@ namespace FoosballAttempt1
             //Sort each team into alphabetical order
             //returns 2 player array
             Player[] teams = MakeTeam(players);
-
             double c = CalculateC(teams[0].Sigma, teams[1].Sigma);
             double t = CalculateT(teams[0].Mu, teams[1].Mu, c);
             double n = CalculateN(t);

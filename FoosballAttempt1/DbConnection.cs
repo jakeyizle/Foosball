@@ -32,7 +32,6 @@ namespace FoosballAttempt1
             }
             return new Player(dataTable.Rows[0].Field<double>("Mu"), dataTable.Rows[0].Field<double>("Sigma"), name);            
         }
-        //Deletes PlayerStats/teamstats table, then goes through MatchRecords table and recalculates stats
         
         //Delete Leaderboard, pull all teams from teamstats, calculate scores/ranks, insert into leaderboard
         public static void RefreshTeamLeaderboard()
