@@ -2,11 +2,9 @@
 using System.Data.SqlClient;
 using System.Data;
 using static FoosballAttempt1.Program;
-using static FoosballAttempt1.Algorithim;
 using static FoosballAttempt1.Player;
 namespace FoosballAttempt1
 {
-    //This class has way too much in it
     public class DbConnection
     {
         //Retrieves player stats from DB, then creates player with that info. 

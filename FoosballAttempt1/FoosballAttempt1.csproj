@@ -45,7 +45,6 @@
   <ItemGroup>
     <Compile Include="Algorithim.cs" />
     <Compile Include="DbConnection.cs" />
-    <Compile Include="Formulas.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

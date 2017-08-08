@@ -22,14 +22,13 @@ namespace FoosballAttempt1
 
         static void Main()
         {
-            string answer = Text("Please choose an option:" +
+
+            switch (Text("Please choose an option:" +
     "\r\n 1. Add a match and update skills" +
     "\r\n 2. View Leaderboard" +
     "\r\n 3. View Team Leaderboard" +
     "\r\n 4. Delete all Player/Team Stats and recalculate from Match Records" +
-    "\r\n 5. Exit");
-
-            switch (answer.ToLower())
+    "\r\n 5. Exit").ToLower())
             {
                 case "1":
                     AddMatch();

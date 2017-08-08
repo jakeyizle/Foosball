@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static FoosballAttempt1.Formulas;
 using static FoosballAttempt1.DbConnection;
 using static FoosballAttempt1.Player;
+using static FoosballAttempt1.Program;
 using System.Data.SqlClient;
 
 namespace FoosballAttempt1
@@ -17,20 +17,15 @@ namespace FoosballAttempt1
             //Sort each team into alphabetical order
             //returns 2 player array
             Player[] teams = MakeTeam(players);
-            double c = CalculateC(teams[0].Sigma, teams[1].Sigma);
-            double t = CalculateT(teams[0].Mu, teams[1].Mu, c);
-            double n = CalculateN(t);
-            double v = CalculateV(n, t);
-            double w = CalculateW(v, t);
-
             foreach (Player player in teams)
             {
                 DynamicsFactor(player);
             }
+            CalculateVandW(teams[0].Sigma, teams[1].Sigma, teams[0].Mu, teams[1].Mu, out double v, out double w, out double c);
+
             //Purposefully don't update Score here, so that we can report on previous and updated scores
             //MU delta = sigma^2/c * v
             int i = 0;
-
             foreach (Player player in teams)
             {
                 if (i < 1)
@@ -58,28 +53,20 @@ namespace FoosballAttempt1
             //Create Team Mus and Sigmas used to calculate intermediate variables
             //Team Mu = Mu+Mu
             //Team Sigma = sqrt(sigma^2+sigma^2)
+            //Add tau^2 to sigma^2
+            foreach (Player player in players)
+            {
+                DynamicsFactor(player);
+            }
+
             double winningMu = TeamMu(players[0].Mu, players[1].Mu);
             double winningSigma = TeamSigma(players[0].Sigma, players[1].Sigma);
 
             double losingMu = TeamMu(players[2].Mu, players[3].Mu);
             double losingSigma = TeamSigma(players[2].Sigma, players[3].Sigma);
 
-            //c^2 = sigma^2+sigma^2+beta^2
-            double c = CalculateC(winningSigma, losingSigma);
-            //t = (mu-mu)/c
-            double t = CalculateT(winningMu, losingMu, c);
-            //n = NormalDistribution(t;0, 1)
-            double n = CalculateN(t);
-            //v = n/cdf(t)
-            double v = CalculateV(n, t);
-            //w = v*(v+t)
-            double w = CalculateW(v, t);
-         
-            //Add tau^2 to sigma^2
-            foreach(Player player in players)
-            {
-                DynamicsFactor(player);
-            }
+            CalculateVandW(winningSigma, losingSigma, winningMu, losingMu, out double v, out double w, out double c);
+
             //MU delta = sigma^2/c * v
             int i = 0;
             foreach(Player player in players)
@@ -121,6 +108,42 @@ namespace FoosballAttempt1
         static double TeamSigma(double sigmaOne, double sigmaTwo)
         {
             return Math.Sqrt(Math.Pow(sigmaOne, 2) + Math.Pow(sigmaTwo, 2));
+        }
+
+        public static void CalculateVandW(double winningSigma, double losingSigma, double winningMu, double losingMu, out double v, out double w, out double c)
+        {
+            c = Math.Sqrt(2 * Math.Pow(BETA, 2) + Math.Pow(winningSigma, 2) + Math.Pow(losingSigma, 2));
+            double t = (winningMu - losingMu) / c;
+            double n = Math.Exp(-Math.Pow(t, 2) / (2)) / Math.Sqrt(2 * Math.PI);
+            v = n / CumDensity(t - 0);
+            w = v * (v + t);
+        }
+
+        public static void DynamicsFactor(Player player)
+        {
+            player.Sigma = Math.Sqrt(Math.Pow(player.Sigma, 2) + Math.Pow(TAU, 2));
+        }
+
+        static double CumDensity(double z)
+        {
+            double p = 0.3275911;
+            double a1 = 0.254829592;
+            double a2 = -0.284496736;
+            double a3 = 1.421413741;
+            double a4 = -1.453152027;
+            double a5 = 1.061405429;
+
+            int sign;
+            if (z < 0.0)
+                sign = -1;
+            else
+                sign = 1;
+
+            double x = Math.Abs(z) / Math.Sqrt(2.0);
+            double t = 1.0 / (1.0 + p * x);
+            double erf = 1.0 - (((((a5 * t + a4) * t) + a3)
+              * t + a2) * t + a1) * t * Math.Exp(-x * x);
+            return 0.5 * (1.0 + sign * erf);
         }
     }
 }

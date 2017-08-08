@@ -8,7 +8,6 @@ using System.Data.SqlClient;
 using static FoosballAttempt1.Program;
 using static FoosballAttempt1.Algorithim;
 using static FoosballAttempt1.DbConnection;
-using static FoosballAttempt1.Formulas;
 using static FoosballAttempt1.Player;
 using System.Data;
 
@@ -121,7 +120,7 @@ namespace FoosballAttempt1
             Console.ReadKey();           
         }
         //Deletes PlayerStats/teamstats table, then goes through MatchRecords table and recalculates stats
-        //this is useful for when you enter 'test matches'. Just delete the matches from the
+        //this is useful for when you enter 'test matches'. Just delete the matches from the database, then run this. itll delete the extra players from playerstats/leaderboard
         public static void RefreshStats()
         {
             ExecuteQuery("TRUNCATE TABLE [PlayerStats]");
