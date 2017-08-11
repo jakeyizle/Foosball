@@ -8,7 +8,8 @@ namespace FoosballAttempt1
         public double Mu { get; set; }
         public double Sigma { get; set; }
         public string Name { get; set; } 
-        public double Score { get; set; }
+        //Score is not the score a game, but the "rating" of a player. Maybe rating would be a better name...
+        public double Rating { get; set; }
         public int Rank { get; set; }
         public int GameCount { get; set; }
 
@@ -17,7 +18,7 @@ namespace FoosballAttempt1
             Mu = mu;
             Sigma = sigma;
             Name = name;
-            Score = mu - 3 * sigma;
+            Rating = mu - 3 * sigma;
             //this is solution to make sure that "teams" get a gamecount
             //only team names should contain " and ", then code is to generate first players name and second players name
             //then count MatchRecords where both players are on same team
@@ -53,15 +54,16 @@ namespace FoosballAttempt1
         }
 
         //Conservative score estimate: 99% of the time you will play at a level at or above this value
-        public static void CalculateScore(Player player)
+        //Need a separate function for this so that we can report previous/updated scores in AddMatch
+        public static void CalculateRating(Player player)
         {
-            player.Score = (player.Mu - 3 * player.Sigma);
+            player.Rating = (player.Mu - 3 * player.Sigma);
         }
 
         //Sorts player array by Score (largest to smallest) then assigns rank
         public static void CalculateRanks(Player[] players)
         {
-            Array.Sort(players, (a, b) => a.Score.CompareTo(b.Score));
+            Array.Sort(players, (a, b) => a.Rating.CompareTo(b.Rating));
             Array.Reverse(players);
             for (int i = 0; i < players.Length; i++)
             {

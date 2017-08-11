@@ -46,7 +46,7 @@ namespace FoosballAttempt1
             CalculateRanks(teams);
             foreach (Player team in teams)
             {
-                ExecuteQuery("INSERT INTO TeamLeaderboard VALUES ('" + team.Name + "', " + team.Rank + ", " + team.Score + ", " + team.GameCount + ")");
+                ExecuteQuery("INSERT INTO TeamLeaderboard VALUES ('" + team.Name + "', " + team.Rank + ", " + team.Rating + ", " + team.GameCount + ")");
             }
         }
         //Delete Leaderboard, pull all players from playerstats, calculate scores/ranks, insert into leaderboard
@@ -64,7 +64,7 @@ namespace FoosballAttempt1
 
             foreach (Player player in players)
             {
-                ExecuteQuery("INSERT INTO Leaderboard VALUES ('" + player.Name + "', " + player.Rank + ", " + player.Score + ", " + player.GameCount + ")");
+                ExecuteQuery("INSERT INTO Leaderboard VALUES ('" + player.Name + "', " + player.Rank + ", " + player.Rating + ", " + player.GameCount + ")");
             }
             
         }

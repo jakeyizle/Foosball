@@ -21,7 +21,9 @@ namespace FoosballAttempt1
             Console.WriteLine(display);
             return Console.ReadLine();
         }
+
         //gets names and date from user, inserts match into matchrecord, updates player/team stats, displays difference in scores, refreshes leaderboard
+        //This doesn't have to refresh leaderboard, as the leaderboard is also refreshed before being displayed
         public static void AddMatch()
         {
             Player[] players = new Player[4];
@@ -45,40 +47,41 @@ namespace FoosballAttempt1
 
             Console.WriteLine("{0,-20}{1,-15}{2,-15}{3,-15}",
                 "Player Name",
-                "Old Score",
-                "New Score",
-                "Score Change");
+                "Old Rating",
+                "New Rating",
+                "Rating Change");
             foreach (Player player in players)
             {
-                double oldscore = player.Score;
-                CalculateScore(player);
+                double oldscore = player.Rating;
+                CalculateRating(player);
                 Console.WriteLine("{0,-20}{1,-15}{2,-15}{3,-15}",
                     player.Name,
                     Math.Round(oldscore, 3),
-                    Math.Round(player.Score, 3),
-                    Math.Round(player.Score - oldscore, 3));
+                    Math.Round(player.Rating, 3),
+                    Math.Round(player.Rating - oldscore, 3));
             }
             Console.Write("\r\n");
             Console.WriteLine("{0,-20}{1,-15}{2,-15}{3,-15}",
                 "Team Name",
-                "Old Score",
-                "New Score",
-                "Score Change");
+                "Old Rating",
+                "New Rating",
+                "Rating Change");
             foreach (Player team in teams)
             {
-                double oldscore = team.Score;
-                CalculateScore(team);
+                double oldscore = team.Rating;
+                CalculateRating(team);
                 Console.WriteLine("{0,-20}{1,-15}{2,-15}{3,-15}",
                     team.Name,
                     Math.Round(oldscore, 3),
-                    Math.Round(team.Score, 3),
-                    Math.Round(team.Score - oldscore, 3));
+                    Math.Round(team.Rating, 3),
+                    Math.Round(team.Rating - oldscore, 3));
             }
             RefreshLeaderboard();
             RefreshTeamLeaderboard();
             Console.WriteLine("\r\nPress any key...");
             Console.ReadKey();
         }
+
         public static void DisplayTeamLeaderboard()
         {
             RefreshTeamLeaderboard();
@@ -86,7 +89,7 @@ namespace FoosballAttempt1
             Console.Write(String.Format("\r\n{0,-6}{1,-20}{2,7}{3,15}",
                 "Rank", 
                 "Team Name",
-                "Score",
+                "Rating",
                 "Games Played"));
             for (int j = 0; j < dataTable.Rows.Count; j++)
             {
@@ -106,7 +109,7 @@ namespace FoosballAttempt1
             Console.Write(String.Format("\r\n{0,-6}{1,-20}{2,7}{3,15}", 
                 "Rank", 
                 "Player Name", 
-                "Score", 
+                "Rating", 
                 "Games Played"));
             for (int j = 0; j < dataTable.Rows.Count; j++)
             {
@@ -142,6 +145,32 @@ namespace FoosballAttempt1
                 TeamSkillUpdate(players);
             }
         }
+        public static void DisplayMatchQuality()
+        {
+            Player player1 = GetPlayer(Text("Please enter the first player"));
+            Player player2 = GetPlayer(Text("Please enter the second player"));
+            Player player3 = GetPlayer(Text("Please enter the third player"));
+            Player player4 = GetPlayer(Text("Please enter the fourth player"));
 
+            Console.WriteLine("\r\n{0,-20}{1,-20}{2,15}",
+                "Team 1",
+                "Team 2",
+                "Match Quality");
+            Console.WriteLine("{0,-20}{1,-20}{2,15}",
+                player1.Name + " and " + player2.Name,
+                player3.Name + " and " + player4.Name,
+                Math.Round(MatchQuality(player1, player2, player3, player4),3));
+            Console.WriteLine("{0,-20}{1,-20}{2,15}",
+                player1.Name + " and " + player3.Name,
+                player2.Name + " and " + player4.Name,
+                Math.Round(MatchQuality(player1, player3, player2, player4), 3));
+            Console.WriteLine("{0,-20}{1,-20}{2,15}",
+                player1.Name + " and " + player4.Name,
+                player3.Name + " and " + player2.Name,
+                Math.Round(MatchQuality(player1, player4, player3, player2), 3));
+
+            Console.WriteLine("\r\nPress any key...");
+            Console.ReadKey();
+        }
     }
 }

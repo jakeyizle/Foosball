@@ -12,19 +12,19 @@ namespace FoosballAttempt1
 {
     class Algorithim
     {
+        //The Skill/Teamskill updates perform calculations to update mu and sigma, then push those updates to the player/team stats table
         public static Player[] TeamSkillUpdate(Player[] players)
         {
-            //Sort each team into alphabetical order
             //returns 2 player array
             Player[] teams = MakeTeam(players);
             foreach (Player player in teams)
             {
                 DynamicsFactor(player);
             }
+
             CalculateVandW(teams[0].Sigma, teams[1].Sigma, teams[0].Mu, teams[1].Mu, out double v, out double w, out double c);
 
             //Purposefully don't update Score here, so that we can report on previous and updated scores
-            //MU delta = sigma^2/c * v
             int i = 0;
             foreach (Player player in teams)
             {
@@ -33,12 +33,10 @@ namespace FoosballAttempt1
                 else { player.Mu = player.Mu - MuDelta(player, c, v); }
                 i++;
             }
-            //sigma = sigma * sqrt( 1 - sigma^2/c^2 * w)
             foreach (Player player in teams)
             {
                 SigmaUpdate(player, c, w);
             }
-            //Push updates to DB
             foreach (Player player in teams)
             {
                 ExecuteQuery("UPDATE [TeamStats] SET Mu = " + player.Mu + ", Sigma = " + player.Sigma + "WHERE Name = '" + player.Name + "'");
@@ -46,19 +44,16 @@ namespace FoosballAttempt1
             return teams;
         }
 
-
-
         public static void SkillUpdate(Player[] players)
         {
-            //Create Team Mus and Sigmas used to calculate intermediate variables
-            //Team Mu = Mu+Mu
-            //Team Sigma = sqrt(sigma^2+sigma^2)
-            //Add tau^2 to sigma^2
+
             foreach (Player player in players)
             {
                 DynamicsFactor(player);
             }
-
+            //Create Team Mus and Sigmas used to calculate intermediate variables
+            //Team Mu = Mu+Mu
+            //Team Sigma = sqrt(sigma^2+sigma^2)
             double winningMu = TeamMu(players[0].Mu, players[1].Mu);
             double winningSigma = TeamSigma(players[0].Sigma, players[1].Sigma);
 
@@ -67,7 +62,6 @@ namespace FoosballAttempt1
 
             CalculateVandW(winningSigma, losingSigma, winningMu, losingMu, out double v, out double w, out double c);
 
-            //MU delta = sigma^2/c * v
             int i = 0;
             foreach(Player player in players)
             {
@@ -77,12 +71,12 @@ namespace FoosballAttempt1
                 else { player.Mu = player.Mu - MuDelta(player, c, v); }
                 i++;
             }
-            //sigma = sigma * sqrt( 1 - sigma^2/c^2 * w)
+
             foreach(Player player in players)
             {
                 SigmaUpdate(player, c, w);
             }
-            //Push updates to DB
+
             foreach(Player player in players)
             {
                 ExecuteQuery("UPDATE [PlayerStats] SET Mu = " + player.Mu + ", Sigma = " + player.Sigma + "WHERE Name = '" + player.Name + "'");
@@ -90,6 +84,18 @@ namespace FoosballAttempt1
 
         }
 
+        public static double MatchQuality(Player player1, Player player2, Player player3, Player player4)
+        {
+            double sigmasum = Math.Pow(player1.Sigma, 2) + Math.Pow(player2.Sigma, 2) + Math.Pow(player3.Sigma, 2) + Math.Pow(player4.Sigma, 2);
+            //Right side of equation is constant for same group of players, no matter the team compositions
+            double rightside = Math.Sqrt((4 * Math.Pow(BETA, 2)) / (4 * Math.Pow(BETA, 2) + sigmasum));
+
+            double leftside = Math.Exp(-0.5 * (player1.Mu + player2.Mu - player3.Mu - player4.Mu) * 1 / (4 * Math.Pow(BETA, 2) + sigmasum) * (player1.Mu + player2.Mu - player3.Mu - player4.Mu));
+
+            return leftside * rightside;
+        }
+
+        //These functions are only used by Skill/Teamskill update
         static double MuDelta(Player player, double c, double v)
         {
             return Math.Pow(player.Sigma, 2) / c * v;
@@ -110,7 +116,7 @@ namespace FoosballAttempt1
             return Math.Sqrt(Math.Pow(sigmaOne, 2) + Math.Pow(sigmaTwo, 2));
         }
 
-        public static void CalculateVandW(double winningSigma, double losingSigma, double winningMu, double losingMu, out double v, out double w, out double c)
+        static void CalculateVandW(double winningSigma, double losingSigma, double winningMu, double losingMu, out double v, out double w, out double c)
         {
             c = Math.Sqrt(2 * Math.Pow(BETA, 2) + Math.Pow(winningSigma, 2) + Math.Pow(losingSigma, 2));
             double t = (winningMu - losingMu) / c;
@@ -119,7 +125,7 @@ namespace FoosballAttempt1
             w = v * (v + t);
         }
 
-        public static void DynamicsFactor(Player player)
+        static void DynamicsFactor(Player player)
         {
             player.Sigma = Math.Sqrt(Math.Pow(player.Sigma, 2) + Math.Pow(TAU, 2));
         }

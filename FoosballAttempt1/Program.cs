@@ -4,6 +4,8 @@ using System.Data;
 using static FoosballAttempt1.DbConnection;
 using static FoosballAttempt1.Algorithim;
 using static FoosballAttempt1.UI;
+using System.Windows.Forms;
+
 
 namespace FoosballAttempt1
 {
@@ -22,13 +24,13 @@ namespace FoosballAttempt1
 
         static void Main()
         {
-
             switch (Text("Please choose an option:" +
     "\r\n 1. Add a match and update skills" +
     "\r\n 2. View Leaderboard" +
     "\r\n 3. View Team Leaderboard" +
     "\r\n 4. Delete all Player/Team Stats and recalculate from Match Records" +
-    "\r\n 5. Exit").ToLower())
+    "\r\n 5. Display match quality" +
+    "\r\n 6. Exit").ToLower())
             {
                 case "1":
                     AddMatch();
@@ -50,6 +52,10 @@ namespace FoosballAttempt1
                     Main();
                     break;
                 case "5":
+                    DisplayMatchQuality();
+                    Main();
+                    break;
+                case "6":
                 case "exit":
                     Environment.Exit(1);
                     break;
